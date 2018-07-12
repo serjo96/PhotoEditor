@@ -1,12 +1,12 @@
 <template>
     <figure class="image-compare" :class="{ full }" @mousemove.prevent="onMouseMove" @touchstart="onMouseMove($event, true)" @touchmove="onMouseMove($event, true)" @click="onMouseMove($event, true)">
-        <div class="image-compare-wrapper" :style="{ width: posX + 'px' }" v-show="!hideAfter">
+        <div class="image-compare-wrapper" :style="{ width: posX + 'px', height: `${this.cavh}px` }" v-show="!hideAfter">
         <canvas ref="my-canvas" id="canv"></canvas>
         </div>
             <img  ref="compareImg" :src="before" :alt="before" :style="dimensions">
             <!--<img :src="after" :alt="after" :style="dimensions">-->
         <div class="image-compare-handle" :style="{ left: posX + 'px' }" @mousedown.prevent="onMouseDown" v-show="!hideAfter">
-            <button v-on:click="testHeight()">TEST</button>
+            <button v-on:click="testCanvas()">TEST</button>
       <span class="image-compare-handle-icon left">
         <slot name="icon-left"></slot>
       </span>
@@ -79,7 +79,14 @@ export default {
               console.log(compareImg.offsetHeight)
               console.log(compareImg.clientHeight)
           });
+      },
+      testCanvas(){
+          const compareImg = this.$refs.compareImg;
+            let cavArrPx = this.$refs['my-canvas'].getImageData(0, 0);
+          this.$nextTick(function () {
+            console.log(cavArrPx)
 
+          });
       },
     onResize() {
       this.width = this.$el.clientWidth;
@@ -123,26 +130,9 @@ export default {
     window.addEventListener('resize', this.onResize);
   },
   mounted() {
-      const canv = this.$refs['my-canvas'];
-      const imgContext = this.$refs['my-canvas'].getContext('2d');
-      const compareImg = this.$refs.compareImg;
-      const img = this.after;
-      let image = new Image();
-      image = document.createElement('img');
-      const _this = this;
 
-
-      image.className = 'BeforeImg';
-      image.setAttribute('alt', 'script div');
-      image.setAttribute('src', _this.before);
-
-
-      canv.width = _this.$el.clientWidth;
-      canv.height = _this.$el.offsetHeight;
-
-      console.log(canv)
-      imgContext.drawImage(image, 0, 0);
       this.onResize();
+
     this.unwatch = this.$watch(
       () => this.padding.left + this.padding.right,
       newValue => this.setInitialPosX(newValue),
@@ -156,21 +146,22 @@ export default {
       let image = new Image();
       image = document.createElement('img');
       const _this = this;
+      this.testHeight();
+      console.log('after updated')
+      compareImg.onload = () => {
+          image.className = 'BeforeImg';
+          image.setAttribute('alt', 'script div');
+          image.setAttribute('src', _this.before);
 
+          _this.cavh = _this.$el.offsetHeight;
+          canv.width = _this.$el.clientWidth;
+          canv.height = _this.$el.offsetHeight;
 
-              image.className = 'BeforeImg';
-              image.setAttribute('alt', 'script div');
-              image.setAttribute('src', _this.before);
-
-
-              canv.width = _this.$el.clientWidth;
-              canv.height = _this.$el.offsetHeight;
-
-              console.log(canv)
-              imgContext.drawImage(image, 0, 0);
-
-
-
+          _this.testHeight();
+          imgContext.drawImage(image, 0, 0, _this.$el.clientWidth, _this.$el.offsetHeight);
+          console.log(imgContext.getImageData(0, 0, _this.$el.clientWidth, _this.$el.offsetHeight))
+          this.onResize();
+      };
   },
 
   beforeDestroy() {
