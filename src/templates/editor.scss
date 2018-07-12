@@ -1,0 +1,41 @@
+
+
+.style {
+  background: #f2f2f2f2;
+}
+
+.img-editor{
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.img-editor__img {
+  position: relative;
+  user-select: none;
+}
+
+.img-editor__delimiter {
+  width: 10px;
+  height: 100%;
+  position: absolute;
+  z-index: 50;
+  left: 0;
+  top: 0;
+  background: #000;
+  cursor: move;
+}
+
+.img-wrap {
+  position: absolute;
+  left: 0;
+  max-width: 500px;
+  z-index: 15;
+  overflow: hidden;
+}
+
+.canvas-cover {
+  canvas {
+    max-width: 500px;
+  }
+}
+

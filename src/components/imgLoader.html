@@ -1,0 +1,21 @@
+<div class="style">
+    <input type="file" @change="processFile">
+    <label for="showCompare">Показать сравнение <input v-model="showCompare" id="showCompare" type="checkbox"></label>
+
+
+    <div class="img-editor">
+        <div class="img-editor__img" ref='imgEditor' >
+            <!--<div class="img-editor__delimiter" ref="delimiter" @mousedown="startDrag" ></div>-->
+            <!--<div ref='imgWrap' class="img-wrap"></div>-->
+            <div class="canvas-cover">
+                <!--<canvas ref="uniqueName" id="canv"></canvas>-->
+            </div>
+            <imgComprare :hideAfter="showCompare" v-if="imgSRC" :before="imgSRC" :after="img"></imgComprare>
+        </div>
+    </div>
+
+
+
+
+    <div>X: {{x}}</div>
+</div>
