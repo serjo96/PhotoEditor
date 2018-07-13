@@ -18,23 +18,23 @@
                  v-show="!hidebefore"
             >
             <!--<img :src="after" :alt="after" :style="dimensions">-->
-      <button v-on:click="testCanvas()">TEST</button>
+        <button class="test-btn" v-on:click="testCanvas()">TEST</button>
 
-      <div class="image-compare-handle"
-           :style="{ left: posX + 'px' }"
-           @mousedown.prevent="onMouseDown"
-           v-show="!hidebefore"
-      >
-          <div class="line"></div>
+        <div class="image-compare-handle"
+             :style="{ left: posX + 'px' }"
+             @mousedown.prevent="onMouseDown"
+             v-show="!hidebefore"
+        >
+            <div class="line"></div>
 
-          <span class="image-compare-handle-icon left">
-            <slot name="icon-left"></slot>
-          </span>
-          <span class="image-compare-handle-icon right">
-            <slot name="icon-right"></slot>
-          </span>
+            <span class="image-compare-handle-icon left">
+              <slot name="icon-left"></slot>
+            </span>
+            <span class="image-compare-handle-icon right">
+              <slot name="icon-right"></slot>
+            </span>
 
-        </div>
+          </div>
     </figure>
 </template>
 
@@ -198,6 +198,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .test-btn{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 90;
+  }
     .image-compare {
         position: relative;
         margin: 0;
