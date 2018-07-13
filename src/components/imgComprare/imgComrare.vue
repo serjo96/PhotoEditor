@@ -1,18 +1,39 @@
 <template>
-    <figure class="image-compare" :class="{ full }" @mousemove.prevent="onMouseMove" @touchstart="onMouseMove($event, true)" @touchmove="onMouseMove($event, true)" @click="onMouseMove($event, true)">
-        <div class="image-compare-wrapper" :style="{ width: posX + 'px', height: `${this.cavh}px` }" v-show="!hideAfter">
-        <canvas ref="my-canvas" id="canv"></canvas>
+    <figure class="image-compare"
+            :class="{ full }"
+            @mousemove.prevent="onMouseMove"
+            @touchstart="onMouseMove($event, true)"
+            @touchmove="onMouseMove($event, true)"
+            @click="onMouseMove($event, true)">
+        <div class="image-compare-wrapper"
+             :style="{ width: !hidebefore  ? `${posX}px` : '100%' , height: `${this.cavh}px`}"
+             v-bind:class="[{ 'image-compare-wrapper--isCompare': hidebefore }]"
+        >
+          <canvas ref="my-canvas" id="canv"></canvas>
         </div>
-            <img  ref="compareImg" :src="before" :alt="before" :style="dimensions">
+            <img ref="compareImg"
+                 :src="before"
+                 :alt="before"
+                 :style="dimensions"
+                 v-show="!hidebefore"
+            >
             <!--<img :src="after" :alt="after" :style="dimensions">-->
-        <div class="image-compare-handle" :style="{ left: posX + 'px' }" @mousedown.prevent="onMouseDown" v-show="!hideAfter">
-            <button v-on:click="testCanvas()">TEST</button>
-      <span class="image-compare-handle-icon left">
-        <slot name="icon-left"></slot>
-      </span>
-            <span class="image-compare-handle-icon right">
-        <slot name="icon-right"></slot>
-      </span>
+      <button v-on:click="testCanvas()">TEST</button>
+
+      <div class="image-compare-handle"
+           :style="{ left: posX + 'px' }"
+           @mousedown.prevent="onMouseDown"
+           v-show="!hidebefore"
+      >
+          <div class="line"></div>
+
+          <span class="image-compare-handle-icon left">
+            <slot name="icon-left"></slot>
+          </span>
+          <span class="image-compare-handle-icon right">
+            <slot name="icon-right"></slot>
+          </span>
+
         </div>
     </figure>
 </template>
@@ -43,7 +64,7 @@ export default {
       },
       required: false,
     },
-    hideAfter: {
+    hidebefore: {
       type: Boolean,
       default: false,
       required: false,
@@ -54,6 +75,7 @@ export default {
       width: null,
       height: null,
       cavh: null,
+      canvCont: null,
       pageX: null,
       posX: null,
       isDragging: false,
@@ -70,24 +92,29 @@ export default {
     },
   },
   methods: {
-      testHeight() {
-          const _this = this;
-          const compareImg = this.$refs.compareImg;
-          this.$nextTick(function () {
-              console.log(_this.$el.offsetHeight)
-              console.log(_this.$el.clientHeight)
-              console.log(compareImg.offsetHeight)
-              console.log(compareImg.clientHeight)
-          });
-      },
-      testCanvas(){
-          const compareImg = this.$refs.compareImg;
-            let cavArrPx = this.$refs['my-canvas'].getImageData(0, 0);
-          this.$nextTick(function () {
-            console.log(cavArrPx)
-
-          });
-      },
+    testHeight() {
+      const _this = this;
+      const compareImg = this.$refs.compareImg;
+      this.$nextTick(() => {
+        console.log(_this.$el.offsetHeight);
+        console.log(_this.$el.clientHeight);
+        console.log(compareImg.offsetHeight);
+        console.log(compareImg.clientHeight);
+      });
+    },
+    testCanvas() {
+      const compareImg = this.$refs.compareImg;
+      const cavArrPx = this.canvCont.getImageData(0, 0, this.$el.clientWidth, this.$el.offsetHeight);
+      this.$nextTick(() => {
+        console.log(cavArrPx);
+        for (let i = 0; i < cavArrPx.data.length; i += 4) {
+          cavArrPx.data[i] = 255 - cavArrPx.data[i]; // red
+          cavArrPx.data[i + 1] = 255 - cavArrPx.data[i + 1]; // green
+          cavArrPx.data[i + 2] = 255 - cavArrPx.data[i + 2]; // blue
+        }
+        this.canvCont.putImageData(cavArrPx, 0, 0);
+      });
+    },
     onResize() {
       this.width = this.$el.clientWidth;
       this.height = this.$el.clientHeight;
@@ -130,8 +157,9 @@ export default {
     window.addEventListener('resize', this.onResize);
   },
   mounted() {
+    this.canvCont = this.$refs['my-canvas'].getContext('2d');
 
-      this.onResize();
+    this.onResize();
 
     this.unwatch = this.$watch(
       () => this.padding.left + this.padding.right,
@@ -139,29 +167,26 @@ export default {
     );
   },
   updated() {
-      const canv = this.$refs['my-canvas'];
-      const imgContext = this.$refs['my-canvas'].getContext('2d');
-      const compareImg = this.$refs.compareImg;
-      const img = this.after;
-      let image = new Image();
-      image = document.createElement('img');
-      const _this = this;
-      this.testHeight();
-      console.log('after updated')
-      compareImg.onload = () => {
-          image.className = 'BeforeImg';
-          image.setAttribute('alt', 'script div');
-          image.setAttribute('src', _this.before);
+    const canv = this.$refs['my-canvas'];
 
-          _this.cavh = _this.$el.offsetHeight;
-          canv.width = _this.$el.clientWidth;
-          canv.height = _this.$el.offsetHeight;
+    const compareImg = this.$refs.compareImg;
+    const img = this.after;
+    let image = new Image();
+    image = document.createElement('img');
+    const _this = this;
+    compareImg.onload = () => {
+      image.className = 'BeforeImg';
+      image.setAttribute('alt', 'script div');
+      image.setAttribute('src', _this.before);
 
-          _this.testHeight();
-          imgContext.drawImage(image, 0, 0, _this.$el.clientWidth, _this.$el.offsetHeight);
-          console.log(imgContext.getImageData(0, 0, _this.$el.clientWidth, _this.$el.offsetHeight))
-          this.onResize();
-      };
+      _this.cavh = _this.$el.offsetHeight;
+      canv.width = _this.$el.clientWidth;
+      canv.height = _this.$el.offsetHeight;
+
+      _this.testHeight();
+      _this.canvCont.drawImage(image, 0, 0, _this.$el.clientWidth, _this.$el.offsetHeight);
+      this.onResize();
+    };
   },
 
   beforeDestroy() {
@@ -207,15 +232,24 @@ export default {
         z-index: 1;
         transform: translateZ(0);
         will-change: width;
+      &--isCompare{
+        position: static;
+      }
     }
     .image-compare-handle {
-        color: #fff;
-        background-color: currentColor;
+
         cursor: ew-resize;
         transform: translateX(-50%) translateZ(0);
         width: 2px;
         z-index: 2;
         will-change: left;
+        padding: 0 5px;
+        .line{
+          color: #fff;
+          background-color: currentColor;
+          width: 2px;
+          height: 100%;
+        }
     }
     .image-compare-handle-icon {
         position: absolute;
