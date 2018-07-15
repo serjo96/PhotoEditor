@@ -89,7 +89,6 @@ export default {
       height: null,
       cavh: null,
       ctx: null,
-        canvBackup: null,
       pageX: null,
       posX: null,
       isDragging: false,
@@ -132,7 +131,7 @@ export default {
       });
     },
       ClearCanvas(){
-          this.ctx.drawImage(this.canvBackup, 0, 0, this.$refs.img.clientWidth, this.$refs.img.offsetHeight);
+          this.ctx.drawImage(this.$refs.img, 0, 0, this.$refs.img.clientWidth, this.$refs.img.offsetHeight);
       },
     onResize() {
       this.width = this.$el.clientWidth;
@@ -202,7 +201,6 @@ export default {
       canv.height = img.offsetHeight;
 
       _this.ctx.drawImage(image, 0, 0, img.clientWidth, img.offsetHeight);
-      _this.canvBackup = img;
       this.onResize();
     };
   },
