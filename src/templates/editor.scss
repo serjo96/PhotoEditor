@@ -2,6 +2,8 @@
 
 .style {
   background: #f2f2f2f2;
+  width: 700px;
+  margin: 0 auto;
 }
 
 .img-editor{
@@ -14,16 +16,6 @@
   user-select: none;
 }
 
-.img-editor__delimiter {
-  width: 10px;
-  height: 100%;
-  position: absolute;
-  z-index: 50;
-  left: 0;
-  top: 0;
-  background: #000;
-  cursor: move;
-}
 
 .img-wrap {
   position: absolute;

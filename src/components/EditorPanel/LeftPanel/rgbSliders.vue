@@ -1,0 +1,69 @@
+<template>
+<div>
+    <div class="editor-panel__slider slider">
+        <div class="slider__title">Red</div>
+        <vue-slider v-bind="options"
+                    :bg-style="{'backgroundColor': 'red'}"
+                    v-model="red"
+                    @callback="changedValue($event, 'red')"
+        ></vue-slider>
+    </div>
+    <div class="editor-panel__slider slider">
+        <div class="slider__title">Blue</div>
+        <vue-slider v-bind="options"
+                    :bg-style="{'backgroundColor': 'blue'}"
+                    v-model="blue"
+                    @callback="changedValue($event, 'blue')"
+        ></vue-slider>
+    </div>
+
+    <div class="editor-panel__slider slider">
+        <div class="slider__title">Green</div>
+        <vue-slider v-bind="options"
+                    :bg-style="{'backgroundColor': 'green'}"
+                    v-model="green"
+                    @callback="changedValue($event, 'green')"
+        ></vue-slider>
+    </div>
+</div>
+</template>
+
+<script>
+import vueSlider from 'vue-slider-component';
+import { mapMutations } from 'vuex';
+
+export default {
+  name: 'rgbSliders',
+  components: {
+    vueSlider,
+  },
+  data() {
+    return {
+      red: 0,
+      blue: 0,
+      green: 0,
+      options: {
+        max: 255,
+        tooltip: 'hover',
+        tooltipDir: 'bottom',
+      },
+    };
+  },
+  methods: {
+    changedValue(val, color) {
+        let colorObj = {
+            color,
+            val,
+        };
+      this.$store.dispatch('ChangeRGBValue', colorObj);
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+    .editor-panel__slider{
+        margin-bottom: 15px;
+    }
+
+</style>

@@ -5,18 +5,25 @@
             @touchstart="onMouseMove($event, true)"
             @touchmove="onMouseMove($event, true)"
             @click="onMouseMove($event, true)">
+        <div class="invisible-img">
+            <img ref="img"
+                :src="before"
+                :alt="before"
+                 v-show="!hidebefore"
+                :style="dimensions"
+            ></div>
         <div class="image-compare-wrapper"
              :style="{ width: !hidebefore  ? `${posX}px` : '100%' , height: `${this.cavh}px`}"
-             v-bind:class="[{ 'image-compare-wrapper--isCompare': hidebefore }]"
+             v-show="!hidebefore"
         >
-          <canvas ref="my-canvas" id="canv"></canvas>
-        </div>
             <img ref="compareImg"
                  :src="before"
                  :alt="before"
                  :style="dimensions"
-                 v-show="!hidebefore"
+
             >
+        </div>
+          <canvas ref="my-canvas" id="canv"></canvas>
             <!--<img :src="after" :alt="after" :style="dimensions">-->
         <button class="test-btn" v-on:click="testCanvas()">TEST</button>
 
@@ -39,6 +46,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'imgComprare',
   props: {
@@ -84,6 +93,8 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['color']),
+
     dimensions() {
       return {
         width: `${this.width}px`,
@@ -91,26 +102,26 @@ export default {
       };
     },
   },
-  methods: {
-    testHeight() {
-      const _this = this;
-      const compareImg = this.$refs.compareImg;
-      this.$nextTick(() => {
-        console.log(_this.$el.offsetHeight);
-        console.log(_this.$el.clientHeight);
-        console.log(compareImg.offsetHeight);
-        console.log(compareImg.clientHeight);
-      });
+  watch: {
+    color: {
+      deep: true,
+      handler(newColor) {
+          this.testCanvas();
+        console.log('Oh, look, a new color!', newColor);
+      },
     },
+  },
+  methods: {
     testCanvas() {
-      const compareImg = this.$refs.compareImg;
       const cavArrPx = this.canvCont.getImageData(0, 0, this.$el.clientWidth, this.$el.offsetHeight);
       this.$nextTick(() => {
         console.log(cavArrPx);
+        let arr = [];
         for (let i = 0; i < cavArrPx.data.length; i += 4) {
-          cavArrPx.data[i] = 255 - cavArrPx.data[i]; // red
-          cavArrPx.data[i + 1] = 255 - cavArrPx.data[i + 1]; // green
-          cavArrPx.data[i + 2] = 255 - cavArrPx.data[i + 2]; // blue
+          cavArrPx.data[i] = this.$store.state.rgbColors.red - cavArrPx.data[i]; // red
+          cavArrPx.data[i + 1] = this.$store.state.rgbColors.green - cavArrPx.data[i + 1]; // green
+          cavArrPx.data[i + 2] = this.$store.state.rgbColors.blue - cavArrPx.data[i + 2]; // blue
+            cavArrPx.data[i + 3] = 255;
         }
         this.canvCont.putImageData(cavArrPx, 0, 0);
       });
@@ -158,7 +169,6 @@ export default {
   },
   mounted() {
     this.canvCont = this.$refs['my-canvas'].getContext('2d');
-
     this.onResize();
 
     this.unwatch = this.$watch(
@@ -170,7 +180,7 @@ export default {
     const canv = this.$refs['my-canvas'];
 
     const compareImg = this.$refs.compareImg;
-    const img = this.after;
+    const img = this.$refs.img;
     let image = new Image();
     image = document.createElement('img');
     const _this = this;
@@ -179,12 +189,11 @@ export default {
       image.setAttribute('alt', 'script div');
       image.setAttribute('src', _this.before);
 
-      _this.cavh = _this.$el.offsetHeight;
-      canv.width = _this.$el.clientWidth;
-      canv.height = _this.$el.offsetHeight;
+      _this.cavh = img.offsetHeight;
+      canv.width = img.clientWidth;
+      canv.height = img.offsetHeight;
 
-      _this.testHeight();
-      _this.canvCont.drawImage(image, 0, 0, _this.$el.clientWidth, _this.$el.offsetHeight);
+      _this.canvCont.drawImage(image, 0, 0, img.clientWidth, img.offsetHeight);
       this.onResize();
     };
   },
@@ -203,6 +212,11 @@ export default {
     top: 0;
     right: 0;
     z-index: 90;
+  }
+
+  .invisible-img{
+      visibility: hidden;
+      position: absolute;
   }
     .image-compare {
         position: relative;
@@ -238,9 +252,6 @@ export default {
         z-index: 1;
         transform: translateZ(0);
         will-change: width;
-      &--isCompare{
-        position: static;
-      }
     }
     .image-compare-handle {
 

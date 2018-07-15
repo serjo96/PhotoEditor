@@ -1,21 +1,27 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <div class="logo">Editor</div>
+    <LeftEditor/>
     <HelloWorld/>
   </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld';
+import LeftEditor from './components/EditorPanel/LeftPanel/LeftEditorPanel';
 
 export default {
   name: 'App',
-    components: {
-        HelloWorld
-    }
+  components: {
+    HelloWorld,
+    LeftEditor,
+  },
 };
 </script>
 
-<style>
-@import "templates/clear.css";
+<style lang="scss">
+
+@import "templates/styles.scss";
+
+
 </style>

@@ -9,7 +9,6 @@ export default {
       imgSRC: '',
       showCompare: false,
       imgLoad: false,
-      x: 'no',
         img: '',
     };
   },
@@ -55,34 +54,6 @@ export default {
     },
     removeImage() {
       this.imgSRC = '';
-    },
-    startDrag() {
-      this.dragging = true;
-      const delimiter = this.$refs.delimiter;
-      // const startX = (delimiter.pageX) ? delimiter.pageX : delimiter.touches[0].pageX;
-      // const offsetLeft = delimiter.getBoundingClientRect().left + document.body.scrollLeft;
-      // this.x = (offsetLeft + parseInt(getComputedStyle(delimiter).width, 10)) - startX;
-      this.x = 0;
-    },
-    stopDrag() {
-      this.dragging = false;
-      this.x = 'no';
-    },
-    doDrag(event) {
-      const delimiter = this.$refs.delimiter;
-      if (this.dragging) {
-        this.x = event.clientX;
-
-        const dragElementWidth = parseInt(getComputedStyle(delimiter).width, 10);
-        const elementOffsetLeft = this.$refs.imgEditor.getBoundingClientRect().left + document.body.scrollLeft;
-        const elementWidth = parseInt(getComputedStyle(delimiter).width, 10);
-        let openRatio = (this.x + (dragElementWidth / 2)) - elementOffsetLeft;
-        console.log(openRatio);
-        openRatio /= elementWidth;
-        const width = `${openRatio * 100}%`;
-        this.$refs.delimiter.style.left = width;
-        this.$refs.imgWrap.style.width = width;
-      }
     },
 
   },
