@@ -13,7 +13,8 @@ export const store = new Vuex.Store({
     rgbColors: {
       red: 0,
         green: 0,
-        blue: 0
+        blue: 0,
+        alpha: 255,
     },
   },
   mutations,

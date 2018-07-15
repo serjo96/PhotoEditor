@@ -25,6 +25,14 @@
                     @callback="changedValue($event, 'green')"
         ></vue-slider>
     </div>
+    <div class="editor-panel__slider slider">
+        <div class="slider__title">Alpha</div>
+        <vue-slider v-bind="options"
+                    :bg-style="{'backgroundColor': 'white'}"
+                    v-model="alpha"
+                    @callback="changedValue($event, 'alpha')"
+        ></vue-slider>
+    </div>
 </div>
 </template>
 
@@ -42,6 +50,7 @@ export default {
       red: 0,
       blue: 0,
       green: 0,
+        alpha: 0,
       options: {
         max: 255,
         tooltip: 'hover',

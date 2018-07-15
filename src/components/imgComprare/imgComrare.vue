@@ -25,7 +25,11 @@
         </div>
           <canvas ref="my-canvas" id="canv"></canvas>
             <!--<img :src="after" :alt="after" :style="dimensions">-->
-        <button class="test-btn" v-on:click="testCanvas()">TEST</button>
+
+        <div class="test-btns">
+            <button class="test-btn" v-on:click="testCanvas()">TEST</button>
+            <button class="test-btn" v-on:click="ClearCanvas()">REST</button>
+        </div>
 
         <div class="image-compare-handle"
              :style="{ left: posX + 'px' }"
@@ -84,7 +88,8 @@ export default {
       width: null,
       height: null,
       cavh: null,
-      canvCont: null,
+      ctx: null,
+        canvBackup: null,
       pageX: null,
       posX: null,
       isDragging: false,
@@ -113,19 +118,22 @@ export default {
   },
   methods: {
     testCanvas() {
-      const cavArrPx = this.canvCont.getImageData(0, 0, this.$el.clientWidth, this.$el.offsetHeight);
+      const cavArrPx = this.ctx.getImageData(0, 0, this.$el.clientWidth, this.$el.offsetHeight);
       this.$nextTick(() => {
         console.log(cavArrPx);
         let arr = [];
         for (let i = 0; i < cavArrPx.data.length; i += 4) {
-          cavArrPx.data[i] = this.$store.state.rgbColors.red - cavArrPx.data[i]; // red
-          cavArrPx.data[i + 1] = this.$store.state.rgbColors.green - cavArrPx.data[i + 1]; // green
-          cavArrPx.data[i + 2] = this.$store.state.rgbColors.blue - cavArrPx.data[i + 2]; // blue
+          cavArrPx.data[i] = cavArrPx.data[i] - this.$store.state.rgbColors.red; // red
+          cavArrPx.data[i + 1] = cavArrPx.data[i + 1] - this.$store.state.rgbColors.green; // green
+          cavArrPx.data[i + 2] = cavArrPx.data[i + 2]- this.$store.state.rgbColors.blue; // blue
             cavArrPx.data[i + 3] = 255;
         }
-        this.canvCont.putImageData(cavArrPx, 0, 0);
+        this.ctx.putImageData(cavArrPx, 0, 0);
       });
     },
+      ClearCanvas(){
+          this.ctx.drawImage(this.canvBackup, 0, 0, this.$refs.img.clientWidth, this.$refs.img.offsetHeight);
+      },
     onResize() {
       this.width = this.$el.clientWidth;
       this.height = this.$el.clientHeight;
@@ -168,7 +176,7 @@ export default {
     window.addEventListener('resize', this.onResize);
   },
   mounted() {
-    this.canvCont = this.$refs['my-canvas'].getContext('2d');
+    this.ctx = this.$refs['my-canvas'].getContext('2d');
     this.onResize();
 
     this.unwatch = this.$watch(
@@ -193,7 +201,8 @@ export default {
       canv.width = img.clientWidth;
       canv.height = img.offsetHeight;
 
-      _this.canvCont.drawImage(image, 0, 0, img.clientWidth, img.offsetHeight);
+      _this.ctx.drawImage(image, 0, 0, img.clientWidth, img.offsetHeight);
+      _this.canvBackup = img;
       this.onResize();
     };
   },
@@ -207,11 +216,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .test-btn{
+  .test-btns{
     position: absolute;
     top: 0;
     right: 0;
     z-index: 90;
+      background: rgba(000,000,000,0.4);
+      padding: 10px;
   }
 
   .invisible-img{
