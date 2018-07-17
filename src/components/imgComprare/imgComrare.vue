@@ -118,17 +118,48 @@ export default {
   methods: {
     testCanvas() {
       const cavArrPx = this.ctx.getImageData(0, 0, this.$el.clientWidth, this.$el.offsetHeight);
-      this.$nextTick(() => {
+      const hue = this.$store.state.rgbColors.Hue;
+      const sat = this.$store.state.rgbColors.Saturation;
+      let light = this.$store.state.rgbColors.Lightness;
         console.log(cavArrPx);
-        let arr = [];
-        for (let i = 0; i < cavArrPx.data.length; i += 4) {
-          cavArrPx.data[i] = cavArrPx.data[i] - this.$store.state.rgbColors.red; // red
-          cavArrPx.data[i + 1] = cavArrPx.data[i + 1] - this.$store.state.rgbColors.green; // green
-          cavArrPx.data[i + 2] = cavArrPx.data[i + 2]- this.$store.state.rgbColors.blue; // blue
-            cavArrPx.data[i + 3] = 255;
-        }
-        this.ctx.putImageData(cavArrPx, 0, 0);
-      });
+
+
+      this.ctx.clearRect(0, 0, this.$el.clientWidth, this.$el.offsetHeight);
+      this.ctx.globalCompositeOperation = "source-over";
+      this.ctx.drawImage(this.$refs.img, 0, 0, this.$el.clientWidth, this.$el.offsetHeight);
+
+
+      this.ctx.globalCompositeOperation = light < 100 ? "color-burn" : "color-dodge";
+        // for common slider, to produce a valid value for both directions
+        light = light >= 100 ? light - 100 : 100 - (100 - light);
+        this.ctx.fillStyle = "hsl(0, 50%, " + light + "%)";
+        this.ctx.fillRect(0, 0, this.$el.clientWidth, this.$el.offsetHeight);
+
+
+
+        this.ctx.globalCompositeOperation = "saturation";
+        this.ctx.fillStyle = "hsl(0," + sat + "%, 50%)";
+        this.ctx.fillRect(0, 0, this.$el.clientWidth, this.$el.offsetHeight);
+
+
+        // adjust hue
+        this.ctx.globalCompositeOperation = "hue";
+        this.ctx.fillStyle = "hsl(" + hue + ",1%, 50%)";
+        this.ctx.fillRect(0, 0, this.$el.clientWidth, this.$el.offsetHeight);
+        // for (let i = 0; i < cavArrPx.data.length; i += 4) {
+        //   cavArrPx.data[i] = cavArrPx.data[i] - this.$store.state.rgbColors.red; // red
+        //   cavArrPx.data[i + 1] = cavArrPx.data[i + 1] - this.$store.state.rgbColors.green; // green
+        //   cavArrPx.data[i + 2] = cavArrPx.data[i + 2]- this.$store.state.rgbColors.blue; // blue
+        //     cavArrPx.data[i + 3] = 255;
+        // }
+        // this.ctx.putImageData(cavArrPx, 0, 0);
+
+      this.ctx.globalCompositeOperation = "destination-in";
+      this.ctx.drawImage(this.$refs.img, 0, 0, this.$el.clientWidth, this.$el.offsetHeight);
+
+      // reset comp. mode to default
+      this.ctx.globalCompositeOperation = "source-over";
+
     },
       ClearCanvas(){
           this.ctx.drawImage(this.$refs.img, 0, 0, this.$refs.img.clientWidth, this.$refs.img.offsetHeight);
@@ -199,7 +230,8 @@ export default {
       _this.cavh = img.offsetHeight;
       canv.width = img.clientWidth;
       canv.height = img.offsetHeight;
-
+      console.log(img.height)
+      _this.ctx.globalCompositeOperation = 'source-over';
       _this.ctx.drawImage(image, 0, 0, img.clientWidth, img.offsetHeight);
       this.onResize();
     };
@@ -230,6 +262,7 @@ export default {
     .image-compare {
         position: relative;
         margin: 0;
+        line-height: 0;
         &.full {
             overflow: hidden;
             height: 100%;

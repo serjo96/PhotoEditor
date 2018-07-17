@@ -33,6 +33,33 @@
                     @callback="changedValue($event, 'alpha')"
         ></vue-slider>
     </div>
+
+  <div class="editor-panel__slider slider">
+        <div class="slider__title">Hue</div>
+        <vue-slider v-bind="options"
+                    :bg-style="{'backgroundColor': 'white'}"
+                    v-model="Hue"
+                    @callback="changedValue($event, 'Hue')"
+        ></vue-slider>
+    </div>
+
+  <div class="editor-panel__slider slider">
+        <div class="slider__title">Saturation</div>
+        <vue-slider v-bind="options"
+                    :bg-style="{'backgroundColor': 'white'}"
+                    v-model="Saturation"
+                    @callback="changedValue($event, 'Saturation')"
+        ></vue-slider>
+    </div>
+
+  <div class="editor-panel__slider slider">
+        <div class="slider__title">Lightness</div>
+        <vue-slider v-bind="options"
+                    :bg-style="{'backgroundColor': 'white'}"
+                    v-model="Lightness"
+                    @callback="changedValue($event, 'Lightness')"
+        ></vue-slider>
+    </div>
 </div>
 </template>
 
@@ -50,7 +77,10 @@ export default {
       red: 0,
       blue: 0,
       green: 0,
-        alpha: 0,
+      alpha: 0,
+      Hue: 0,
+      Saturation: 0,
+      Lightness: 0,
       options: {
         max: 255,
         tooltip: 'hover',
@@ -60,10 +90,10 @@ export default {
   },
   methods: {
     changedValue(val, color) {
-        let colorObj = {
-            color,
-            val,
-        };
+      const colorObj = {
+        color,
+        val,
+      };
       this.$store.dispatch('ChangeRGBValue', colorObj);
     },
   },
